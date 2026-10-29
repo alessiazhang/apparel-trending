@@ -5,12 +5,26 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TOP款趋势分析</title>
 <style>
-:root { --temu:#FB7701; --temu-dark:#E5620A; --temu-deep:#C74E08; --gray:#666; }
+:root {
+  --temu:#FB7701; --temu-dark:#E5620A; --temu-deep:#C74E08; --gray:#666;
+  /* ===== 响应式尺度(全部按视口比例计算, 不写死) ===== */
+  --sidebar-w: clamp(196px, 15vw, 242px);
+  --cols: 6;                                   /* 商品卡列数, 由断点覆盖 */
+  --card-gap: clamp(8px, 0.85vw, 16px);        /* 卡间距随屏宽变化 */
+  --main-max: clamp(1000px, 92vw, 1720px);     /* 内容区最大宽度 */
+  --main-px: clamp(16px, 3.2vw, 54px);         /* 内容区左右留白 */
+  --main-pt: clamp(14px, 1.6vw, 28px);
+  --tab-fs: clamp(12.5px, 0.95vw, 14.5px);     /* 页签字号 */
+  --tab-px: clamp(11px, 1.25vw, 19px);         /* 页签左右内边距 */
+  --tab-py: clamp(6px, 0.55vw, 9px);
+}
 * { box-sizing:border-box; margin:0; padding:0; }
 body { font-family:"Microsoft YaHei","PingFang SC",sans-serif; background:#fff; color:#222; }
 /* ===== 布局(参考: 白色固定侧边栏) ===== */
-.sidebar { position:fixed; left:0; top:0; width:220px; height:calc(100vh - 36px); background:#fff; border-right:1px solid #e0e0e0; z-index:100; display:flex; flex-direction:column; overflow-y:auto; }
-.main { margin-left:220px; padding:24px 52px 90px 28px; overflow-x:hidden; }
+.sidebar { position:fixed; left:0; top:0; width:var(--sidebar-w); height:calc(100vh - 36px); background:#fff; border-right:1px solid #e0e0e0; z-index:100; display:flex; flex-direction:column; overflow-y:auto; }
+.main { margin-left:var(--sidebar-w); padding:var(--main-pt) var(--main-px) 90px clamp(16px, 2.2vw, 30px); overflow-x:hidden; }
+/* 内容区按视口比例限宽, 超宽屏居中 */
+.main > .trend-panel, .main > .empty-hint { max-width:var(--main-max); margin-left:auto; margin-right:auto; }
 /* ===== 顶部logo(商家服务站链接) ===== */
 .logo { padding:20px; display:flex; align-items:center; gap:10px; border-bottom:1px solid #f0f0f0; }
 .logo-icon { width:40px; height:40px; background:#FB7701; border-radius:8px; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:bold; font-size:18px; flex-shrink:0; }
@@ -43,7 +57,7 @@ body { font-family:"Microsoft YaHei","PingFang SC",sans-serif; background:#fff; 
 .contact-group:last-child { margin-bottom:4px; }
 .contact-group-title { display:flex; align-items:center; gap:8px; font-size:15px; font-weight:700; color:#333; margin:0 0 12px; padding-left:10px; border-left:4px solid #FB7701; }
 .contact-group-title .contact-group-count { font-size:12px; font-weight:400; color:#999; }
-.contact-row { display:grid; grid-template-columns:repeat(var(--cols, 5), minmax(0,1fr)); gap:12px; align-items:start; }
+.contact-row { display:grid; grid-template-columns:repeat(var(--contact-cols, 5), minmax(0,1fr)); gap:12px; align-items:start; }
 .contact-row .card { padding:14px 10px; }
 @media (max-width:1080px) { .contact-row { grid-template-columns:repeat(3, minmax(0,1fr)); } }
 @media (max-width:760px)  { .contact-row { grid-template-columns:repeat(2, minmax(0,1fr)); } }
@@ -60,8 +74,8 @@ body { font-family:"Microsoft YaHei","PingFang SC",sans-serif; background:#fff; 
 /* ===== 面板 ===== */
 .trend-panel { display:none; }
 .trend-panel.active { display:block; }
-.ctabs { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px; border-bottom:2px solid #f0f0f0; padding-bottom:10px; }
-.ctab { padding:8px 18px; border:none; border-radius:20px; background:#f5f5f5; color:#555; font-size:14px; cursor:pointer; transition:all .2s; }
+.ctabs { display:flex; flex-wrap:wrap; gap:clamp(6px,0.6vw,9px); margin-bottom:16px; border-bottom:2px solid #f0f0f0; padding-bottom:10px; }
+.ctab { padding:var(--tab-py) var(--tab-px); border:none; border-radius:20px; background:#f5f5f5; color:#555; font-size:var(--tab-fs); cursor:pointer; transition:all .2s; white-space:nowrap; }
 .ctab.active { background:var(--temu); color:#fff; font-weight:600; box-shadow:0 2px 6px rgba(251,119,1,.35); }
 .ctab:hover { background:#ffe8d1; color:var(--temu); }
 /* 类目面板(核心: 修复切换交互) */
@@ -69,15 +83,15 @@ body { font-family:"Microsoft YaHei","PingFang SC",sans-serif; background:#fff; 
 .cpanel { display:none; }
 .cpanel.active { display:block; }
 /* 子tab(横向) */
-.stabs { display:flex; gap:6px; margin:10px 0 14px; padding:6px 10px; background:#fff7ef; border-radius:10px; }
-.stab { padding:7px 16px; border:1px solid #ffd9b3; border-radius:16px; background:#fff; color:var(--temu); font-size:13px; cursor:pointer; transition:all .2s; }
+.stabs { display:flex; gap:clamp(5px,0.5vw,7px); margin:10px 0 14px; padding:clamp(5px,0.45vw,8px) clamp(7px,0.8vw,11px); background:#fff7ef; border-radius:10px; }
+.stab { padding:var(--tab-py) clamp(10px,1.15vw,17px); border:1px solid #ffd9b3; border-radius:16px; background:#fff; color:var(--temu); font-size:calc(var(--tab-fs) - 0.6px); cursor:pointer; transition:all .2s; white-space:nowrap; }
 .stab.active { background:var(--temu); color:#fff; font-weight:600; border-color:var(--temu); }
 .stab:hover { background:#ffe8d1; }
 .spanel { display:none; }
 .spanel.active { display:block; }
 /* 家居服嵌套子tab(长袖/短袖) */
-.nstabs { display:flex; gap:6px; margin:10px 0 14px; padding:6px 10px; background:#fff7ef; border-radius:10px; }
-.nstab { padding:7px 16px; border:1px solid #ffd9b3; border-radius:16px; background:#fff; color:var(--temu); font-size:13px; cursor:pointer; transition:all .2s; }
+.nstabs { display:flex; gap:clamp(5px,0.5vw,7px); margin:10px 0 14px; padding:clamp(5px,0.45vw,8px) clamp(7px,0.8vw,11px); background:#fff7ef; border-radius:10px; }
+.nstab { padding:var(--tab-py) clamp(10px,1.15vw,17px); border:1px solid #ffd9b3; border-radius:16px; background:#fff; color:var(--temu); font-size:calc(var(--tab-fs) - 0.6px); cursor:pointer; transition:all .2s; white-space:nowrap; }
 .nstab.active { background:var(--temu); color:#fff; font-weight:600; border-color:var(--temu); }
 .nstab:hover { background:#ffe8d1; }
 .npanel { display:none; }
@@ -85,7 +99,7 @@ body { font-family:"Microsoft YaHei","PingFang SC",sans-serif; background:#fff; 
 .sub-block { margin:18px 0; }
 .block-title { font-size:16px; font-weight:700; color:var(--temu); margin-bottom:10px; display:flex; align-items:center; gap:8px; }
 .block-title .cnt { font-size:12px; background:#ffe8d1; color:var(--temu); padding:2px 8px; border-radius:10px; font-weight:500; }
-.card-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(158px,1fr)); gap:14px; }
+.card-grid { display:grid; grid-template-columns:repeat(var(--cols),minmax(0,1fr)); gap:var(--card-gap); align-items:start; }
 .card { background:#fff; border:1px solid #eee; border-radius:12px; overflow:hidden; transition:transform .2s, box-shadow .2s; }
 .card:hover { transform:translateY(-3px); box-shadow:0 6px 16px rgba(0,0,0,.12); }
 .imgwrap { position:relative; width:100%; aspect-ratio:3/4; background:#fafafa; }
@@ -93,7 +107,7 @@ body { font-family:"Microsoft YaHei","PingFang SC",sans-serif; background:#fff; 
 .card-label { padding:8px 10px; font-size:12.5px; color:#555; text-align:center; }
 .bstyle-card .card-label { font-weight:600; color:var(--temu); }
 /* 版型并排网格 */
-.style-grid { grid-template-columns:repeat(auto-fill,minmax(170px,1fr)); }
+.style-grid { grid-template-columns:repeat(auto-fill,minmax(clamp(150px,14vw,210px),1fr)); }
 /* ===== 灯箱 ===== */
 .lightbox { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,.88); z-index:999; align-items:center; justify-content:center; }
 .lightbox.open { display:flex; }
@@ -125,17 +139,31 @@ body { font-family:"Microsoft YaHei","PingFang SC",sans-serif; background:#fff; 
 .contact-modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:300; justify-content:center; align-items:flex-start; overflow-y:auto; }
 .contact-modal.show { display:flex !important; }
 .invite-hint { cursor:pointer; }
-@media (max-width:768px) {
-  .sidebar { width:60px; }
-  .logo-text,.nav-item span { display:none; }
-  .main { margin-left:60px; }
+/* ===== 窄屏: 侧栏改为横排可滑动导航条(不再挤成多行) ===== */
+@media (max-width:900px) {
+  .sidebar { position:sticky; top:0; left:0; width:100%; height:auto; flex-direction:row; align-items:stretch; border-right:none; border-bottom:1px solid #e5e5e5; overflow-x:auto; overflow-y:hidden; scrollbar-width:none; -ms-overflow-style:none; }
+  .sidebar::-webkit-scrollbar { display:none; width:0; height:0; }
+  .logo { flex-shrink:0; padding:0 13px; border-bottom:none; border-right:1px solid #f0f0f0; }
+  .logo-icon { width:30px; height:30px; font-size:14px; border-radius:7px; }
+  .logo-text { display:none; }
+  .nav { flex:0 0 auto; display:flex; align-items:stretch; padding:0; }
+  .nav-item { width:auto; white-space:nowrap; flex-shrink:0; border-left:none !important; border-bottom:2px solid transparent; padding:13px clamp(9px,1.6vw,15px); font-size:13px; }
+  .nav-item.lvl2 { padding-left:clamp(9px,1.6vw,15px); font-size:12.5px; }
+  .nav-item.lvl1.active { border-bottom-color:transparent; }
+  .nav-item.lvl2.active { border-bottom-color:var(--temu); }
+  .nav-arrow { display:none; }
+  /* 联系方式块压缩为条形按钮, 不把导航挤成多行 */
+  .sidebar > div[style*="linear-gradient"] { display:flex; align-items:center; padding:0 clamp(8px,1.5vw,14px) 0 0 !important; background:none !important; flex-shrink:0 !important; }
+  .sidebar > div[style*="linear-gradient"] > div:not([onclick]) { display:none; }
+  .sidebar > div[style*="linear-gradient"] > div[onclick] { margin-top:0 !important; padding:7px 14px !important; border-radius:16px !important; background:#FB7701 !important; color:#fff !important; font-size:12.5px !important; white-space:nowrap; }
+  .main { margin-left:0; }
   .ip-tip-body { width:200px; font-size:12px; }
 }
 /* ===== 上新路径卡片(参照 BSR 上新路径参数规范) ===== */
-.path-card { background:#fff; border:1px solid #e4e8ef; border-radius:17px; box-shadow:0 4px 16px rgba(25,37,58,.045); padding:14px 17px; margin:0 0 16px; }
-.path-card .label { font-size:12px; color:#697386; font-weight:400; margin-bottom:6px; }
+.path-card { background:#fff; border:1px solid #e4e8ef; border-radius:17px; box-shadow:0 4px 16px rgba(25,37,58,.045); padding:clamp(11px,1vw,16px) clamp(12px,1.2vw,18px); margin:0 0 16px; }
+.path-card .label { font-size:clamp(11.5px,0.85vw,12.5px); color:#697386; font-weight:400; margin-bottom:6px; }
 .path-card .category + .category { margin-top:7px; }
-.category { position:relative; font-size:13px; font-weight:700; line-height:1.65; color:#263247; background:#f8f9fb; border-left:3px solid #fb7701; padding:8px 10px; border-radius:6px; word-break:break-all; cursor:pointer; transition:color .18s ease, background .18s ease, border-color .18s ease; }
+.category { position:relative; font-size:clamp(11.8px,0.92vw,13.4px); font-weight:700; line-height:1.65; color:#263247; background:#f8f9fb; border-left:3px solid #fb7701; padding:clamp(7px,0.6vw,9px) clamp(9px,0.8vw,11px); border-radius:6px; word-break:break-all; overflow-wrap:anywhere; cursor:pointer; transition:color .18s ease, background .18s ease, border-color .18s ease; }
 .category:hover { color:#fb7701; background:#eef1f6; }
 .category.copied { color:#147d64; border-left-color:#147d64; background:#e9edf3; }
 .category::after { content:"点击可复制"; position:absolute; left:0; top:-32px; background:#263247; color:#fff; font-size:11px; font-weight:500; line-height:1; padding:6px 9px; border-radius:6px; white-space:nowrap; opacity:0; transform:translateY(3px); transition:opacity .18s ease, transform .18s ease; pointer-events:none; z-index:20; }
@@ -144,7 +172,38 @@ body { font-family:"Microsoft YaHei","PingFang SC",sans-serif; background:#fff; 
 .category:hover::before { opacity:1; }
 #toast { position:fixed; left:50%; bottom:72px; transform:translateX(-50%) translateY(10px); background:#263247; color:#fff; font-size:13px; line-height:1.4; padding:10px 16px; border-radius:8px; box-shadow:0 6px 20px rgba(0,0,0,.25); opacity:0; visibility:hidden; transition:opacity .2s, transform .2s, visibility .2s; z-index:900; max-width:80vw; word-break:break-all; text-align:center; }
 #toast.show { opacity:1; visibility:visible; transform:translateX(-50%) translateY(0); }
-@media (max-width:1000px) { .path-card .category { font-size:12.5px; } }
+/* ===== 断点: 商品卡列数(手机2 / 平板3~4 / 桌面5~7 / 超宽屏自然增加) ===== */
+@media (max-width:1200px) { :root { --cols:5; } }
+@media (max-width:1024px) { :root { --cols:4; } }
+@media (max-width:820px)  { :root { --cols:3; } }
+@media (max-width:560px)  { :root { --cols:2; } }
+@media (min-width:1800px) { :root { --cols:7; } }
+@media (min-width:2300px) { :root { --cols:8; } }
+
+/* ===== 窄屏页签: 文字不换行, 横向滑动承载 ===== */
+@media (max-width:760px) {
+  .ctabs, .stabs, .nstabs { flex-wrap:nowrap; overflow-x:auto; overflow-y:hidden; scrollbar-width:none; -ms-overflow-style:none; }
+  .ctabs::-webkit-scrollbar, .stabs::-webkit-scrollbar, .nstabs::-webkit-scrollbar { display:none; width:0; height:0; }
+  .stabs, .nstabs { padding-left:6px; padding-right:6px; }
+}
+
+/* ===== 手机端细调: 标题/编号/风险说明字号与卡片内边距 ===== */
+@media (max-width:640px) {
+  .main { padding-bottom:78px; }
+  .block-title { font-size:14.5px; gap:6px; }
+  .block-title .cnt { font-size:11px; padding:2px 7px; }
+  .sub-block { margin:14px 0; }
+  .card { border-radius:10px; }
+  .card-label { font-size:11.5px; padding:6px 7px; line-height:1.35; }
+  .imgwrap { border-radius:0; }
+  .ip-flag { font-size:9px; padding:1px 5px; border-radius:3px; top:4px; left:4px; letter-spacing:.3px; }
+  .ip-cap { font-size:9.5px; padding:2px 3px; line-height:1.3; }
+  .ip-pop { max-width:70vw; font-size:11px; padding:6px 8px; }
+  .risk-note { font-size:11px; padding:4px 7px; margin:2px 2px 6px; }
+  .ip-tip-tab { font-size:11px; padding:10px 3px; letter-spacing:2px; }
+  .disclaimer { font-size:11.5px; padding:9px 12px; }
+  .empty-hint { padding:22px; font-size:13px; }
+}
 </style>
 </head>
 <body>
